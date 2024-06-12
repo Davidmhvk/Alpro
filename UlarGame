@@ -1,0 +1,122 @@
+import java.util.Random;
+import java.util.Scanner;
+
+public class UlarGame {
+    public static final int KOTAK_SIZE = 10;
+    public static final char EMPTY_CELL = '-';
+    public static final char ULAR_CELL = 'O';
+    public static final char MAKANAN_CELL = '*';
+    public static final char TEMBOK_CELL = '#';
+
+    // Deklarasi variabel
+    private char[][] grid;
+    private int ularX, ularY;
+    private int MAKANANX, MAKANANY;
+    private Random random;
+    private boolean gameOver;
+
+    // fungsi ular
+    public UlarGame() {
+        grid = new char[KOTAK_SIZE][KOTAK_SIZE];
+        random = new Random();
+        initGame();
+    }
+
+    // fungsi map
+    public void initGame() {
+        for (int i = 0; i < KOTAK_SIZE; i++) {
+            for (int j = 0; j < KOTAK_SIZE; j++) {
+                if (i == 0 || i == KOTAK_SIZE - 1 || j == 0 || j == KOTAK_SIZE - 1) {
+                    grid[i][j] = TEMBOK_CELL;
+                } else {
+                    grid[i][j] = EMPTY_CELL;
+                }
+            }
+        }
+
+        ularX = KOTAK_SIZE / 2;
+        ularY = KOTAK_SIZE / 2;
+        grid[ularX][ularY] = ULAR_CELL;
+
+        MAKANAN();
+        gameOver = false;
+    }
+
+    // fungsi MAKANAN
+    public void MAKANAN() {
+        do {
+            MAKANANX = random.nextInt(KOTAK_SIZE);
+            MAKANANY = random.nextInt(KOTAK_SIZE);
+        } while (grid[MAKANANX][MAKANANY] != EMPTY_CELL);
+        grid[MAKANANX][MAKANANY] = MAKANAN_CELL;
+    }
+
+    // fungsi map
+    public void displayGrid() {
+        for (int i = 0; i < KOTAK_SIZE; i++) {
+            for (int j = 0; j < KOTAK_SIZE; j++) {
+                System.out.print(grid[i][j] + "  ");
+            }
+            System.out.println();
+        }
+    }
+
+    // pergerakan
+    public void move(char direction) {
+        if (gameOver) return; // Jika permainan sudah berakhir, hentikan pergerakan ular
+
+        grid[ularX][ularY] = EMPTY_CELL;
+
+        int nextX = ularX, nextY = ularY;
+        switch (direction) {
+            case 'w':
+                nextX--;
+                break;
+            case 's':
+                nextX++;
+                break;
+            case 'a':
+                nextY--;
+                break;
+            case 'd':
+                nextY++;
+                break;
+        }
+
+        if (grid[nextX][nextY] == TEMBOK_CELL) {
+            gameOver = true;
+            System.out.println("Ular menabrak tembok! Game Over!");
+            return;
+        }
+
+        ularX = nextX;
+        ularY = nextY;
+
+        if (ularX == MAKANANX && ularY == MAKANANY) {
+            MAKANAN();
+        }
+
+        grid[ularX][ularY] = ULAR_CELL;
+    }
+
+    public static void main(String[] args) {
+        // pemanggilan fungsi
+        Scanner scanner = new Scanner(System.in);
+        UlarGame game = new UlarGame();
+
+        while (!game.gameOver) {
+            game.displayGrid();
+            System.out.print("Gunakan tombol (w/a/s/d) atau 'q' untuk keluar game: ");
+            char direction = scanner.next().charAt(0);
+
+            if (direction == 'q') {
+                System.out.println("Terima kasih ya sudah main");
+                break;
+            }
+
+            game.move(direction);
+        }
+
+        scanner.close();
+    }
+}
